@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hip‑Hop Music Visualization</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body>
+  <div class="container">
+    <h1>Hip‑Hop Track Visualizer</h1>
+
+    <div class="tracks-container">
+      {% for track in tracks %}
+      <div class="track">
+        <div class="track-controls">
+          <label>
+            <input type="checkbox"
+                   class="track-toggle"
+                   data-track="{{ track.name.lower() }}"
+                   checked>
+            {{ track.name }}
+          </label>
+          <audio id="{{ track.name.lower() }}"
+                 src="{{ url_for('static', filename='audio/' + track.file) }}"
+                 preload="auto"></audio>
+          <div class="volume-control">
+            <input type="range"
+                   class="volume-slider"
+                   min="0" max="100" value="100"
+                   data-track="{{ track.name.lower() }}"/>
+          </div>
+        </div>
+        <div class="visualization"
+             id="{{ track.name.lower() }}-viz"></div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="transport-controls">
+      <button id="play-all">Play All</button>
+      <button id="stop-all">Stop All</button>
+    </div>
+  </div>
+
+  <!-- Optional main visualizer canvas (unused in this script) -->
+  <canvas id="main-visualization" style="display:none;"></canvas>
+
+  <script>
+    class AudioVisualizer {
+      constructor() {
+        this.tracks = document.querySelectorAll('.track');
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        this.setupTracks();
+        this.setupTransportControls();
+      }
+
+      setupTracks() {
+        this.tracks.forEach(trackEl => this.setupTrackVisualization(trackEl));
+      }
+
+      setupTrackVisualization(trackEl) {
+        // 1. Find (or create) a <canvas> inside the .visualization div
+        const container = trackEl.querySelector('.visualization');
+        let canvas = container.querySelector('canvas');
+        if (!canvas) {
+          canvas = document.createElement('canvas');
+          canvas.width  = container.clientWidth  || 600;
+          canvas.height = container.clientHeight || 100;
+          container.appendChild(canvas);
+        }
+
+        // 2. Guard: ensure it's actually a canvas
+        if (!(canvas instanceof HTMLCanvasElement)) {
+          console.error('Expected a <canvas> element but got:', canvas);
+          return;
+        }
+        const ctx = canvas.getContext('2d');
+
+        // 3. Hook up the audio element to an AnalyserNode
+        const audioEl  = trackEl.querySelector('audio');
+        const source   = this.audioContext.createMediaElementSource(audioEl);
+        const analyser = this.audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        analyser.connect(this.audioContext.destination);
+
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        // 4. Draw loop
+        const draw = () => {
+          requestAnimationFrame(draw);
+          analyser.getByteFrequencyData(dataArray);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          const barWidth = (canvas.width / dataArray.length) * 2.5;
+          let x = 0;
+          for (let i = 0; i < dataArray.length; i++) {
+            const barHeight = dataArray[i] / 2;
+            ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+            x += barWidth + 1;
+          }
+        };
+        draw();
+
+        // 5. Enable/disable toggle button
+        const button = trackEl.querySelector('.track-toggle');
+        button.addEventListener('change', () => {
+          if (button.checked) {
+            audioEl.play();
+          } else {
+            audioEl.pause();
+          }
+        });
+
+        // 6. Volume slider
+        const slider = trackEl.querySelector('.volume-slider');
+        slider.addEventListener('input', () => {
+          audioEl.volume = slider.value / 100;
+        });
+      }
+
+      setupTransportControls() {
+        const playAllBtn = document.getElementById('play-all');
+        const stopAllBtn = document.getElementById('stop-all');
+
+        playAllBtn.addEventListener('click', () => {
+          this.tracks.forEach(trackEl => {
+            const audio = trackEl.querySelector('audio');
+            audio.play();
+            trackEl.querySelector('.track-toggle').checked = true;
+          });
+        });
+
+        stopAllBtn.addEventListener('click', () => {
+          this.tracks.forEach(trackEl => {
+            const audio = trackEl.querySelector('audio');
+            audio.pause();
+            audio.currentTime = 0;
+            trackEl.querySelector('.track-toggle').checked = false;
+          });
+        });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      new AudioVisualizer();
+    });
+  </script>
+</body>
+</html>
