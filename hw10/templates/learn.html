@@ -1,0 +1,25 @@
+<!-- File: test_01/templates/learn.html -->
+{% extends 'base.html' %}
+{% block content %}
+  <div class="placeholder-content">{{ data.text }}</div>
+
+  {% if not is_last %}
+    <div class="d-flex justify-content-between px-5 mt-4">
+      {% if page > 1 %}
+        <a href="{{ url_for('learn', page=page-1) }}" class="btn btn-secondary">BACK</a>
+      {% else %}
+        <!-- placeholder to push NEXT to the right -->
+        <span></span>
+      {% endif %}
+      <a href="{{ url_for('learn', page=page+1) }}" class="btn btn-secondary">NEXT</a>
+    </div>
+  {% else %}
+    <div class="d-flex justify-content-between px-5 mt-3">
+      <a href="{{ url_for('learn', page=page-1) }}" class="btn btn-secondary">BACK</a>
+      <div>
+        <a href="{{ url_for('quiz', page=1) }}" class="btn btn-primary mr-3">START QUIZ</a>
+        <a href="{{ url_for('home') }}" class="btn btn-primary">HOME</a>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,18 @@
+/* Navbar */
+.navbar { background-color:#2154FF!important; padding:1rem 2rem; }
+.navbar-brand{font-size:2.25rem;font-weight:bold;color:#fff!important;}
+.navbar-nav .nav-link{font-size:1.125rem;margin-left:1.5rem;color:#fff!important;}
+
+/* Home hero */
+.home-row{display:flex;height:70vh;}
+.home-text{display:flex;flex-direction:column;justify-content:center;}
+.home-img{display:flex;align-items:flex-end;padding-bottom:2rem;height:80vh;}
+
+/* Buttons */
+.btn-primary{background:#2154FF;border:none;border-radius:12px;padding:12px 24px;font-size:1.25rem;transition:background 0.2s;}
+.btn-primary:hover{background:#1a43cc;}
+.btn-secondary{background:#E0E0E0;border:none;border-radius:12px;padding:12px 24px;font-size:1.25rem;color:#000;transition:background 0.2s;}
+.btn-secondary:hover{background:#c7c7c7;}
+
+/* Placeholder */
+.placeholder-content{background:#F5F5F5;border-radius:8px;margin:20px 0;padding:60px 20px;text-align:center;font-size:1.5rem;}
