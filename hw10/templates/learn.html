@@ -1,6 +1,20 @@
 <!-- File: test_01/templates/learn.html -->
 {% extends 'base.html' %}
 {% block content %}
+
+<div class="d-flex align-items-center my-4">
+  <div class="progress flex-grow-1"
+       role="progressbar"
+       aria-valuemin="1"
+       aria-valuemax="{{ total_pages }}"
+       aria-valuenow="{{ page }}">
+    <div class="progress-bar"
+         style="width: {{ (page/total_pages*100)|round(2) }}%;"></div>
+  </div>
+  <span class="ml-3 font-weight-bold">{{ page }}/{{ total_pages }}</span>
+</div>
+
+
   <div class="placeholder-content">{{ data.text }}</div>
 
   {% if not is_last %}

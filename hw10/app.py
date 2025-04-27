@@ -19,7 +19,7 @@ def learn(page):
     if page < 1 or page > total:
         return redirect(url_for('home'))
     data = pages['learn'][page-1]
-    return render_template('learn.html', page=page, data=data, is_last=(page==total))
+    return render_template('learn.html', page=page, total_pages=total, data=data, is_last=(page==total))
 
 @app.route('/quiz/<int:page>')
 def quiz(page):
@@ -29,7 +29,7 @@ def quiz(page):
         return redirect(url_for('home'))
     q = pages['quiz'][page-1]
     prev = next((a for a in session.get('quiz_answers',[]) if a['page']==page), None)
-    return render_template('quiz.html', page=page, question=q,
+    return render_template('quiz.html', page=page, total_pages=total, question=q,
                            selected=(prev['answer'] if prev else None),
                            correct=(prev['correct'] if prev else None),
                            is_last=(page==total))
