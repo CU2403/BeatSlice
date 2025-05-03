@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
-import json, time
+import json, time, os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
@@ -54,6 +54,17 @@ def result():
     ans = session.get('quiz_answers',[])
     score = sum(1 for a in ans if a['correct'])
     return render_template('result.html', score=score, total=len(pages['quiz']))
+
+@app.route('/visualization')
+def visualization():
+    # scan static/audio for .mp3 files
+    audio_dir = os.path.join(app.static_folder, 'audio')
+    tracks = []
+    for fn in os.listdir(audio_dir):
+        if fn.lower().endswith('.mp3'):
+            name = os.path.splitext(fn)[0].replace('_',' ').title()
+            tracks.append({'name': name, 'file': fn})
+    return render_template('visualization.html', tracks=tracks)
 
 if __name__=='__main__':
     app.run(debug=True)
