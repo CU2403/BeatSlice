@@ -1,0 +1,35 @@
+{# templates/home.html #}
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  .home-hero-img {
+    width: 100%;
+    height: auto;
+    transform-origin: left center;
+    transform: scale(1.3);
+  }
+</style>
+
+<div class="container py-5">
+  <div class="row align-items-center">
+    <div class="col-md-6">
+      <h1 class="display-5 fw-bold">Feel The Flow, Hear The Beat</h1>
+      <p class="text-secondary mt-4">
+        BeatSlice is an interactive platform designed to train your ears and sharpen your instincts when it comes to music. Whether you're a curious listener, a budding producer, or just someone who wants to understand what makes a track tick — BeatSlice helps you break down the music you love into its core components. Learn to identify vocals, drums, basslines, and more by ear. Explore the art of sampling, and discover how iconic tracks are built from sounds that came before.
+      </p>
+      <div class="d-flex gap-4 mt-5">
+        <a href="{{ url_for('learn1') }}" class="btn btn-primary-custom">LEARN</a>
+        <a href="{{ url_for('quiz', step=1) }}" class="btn btn-primary-custom">QUIZ</a>
+      </div>
+    </div>
+
+    <div class="col-md-6 text-center">
+      <img
+        src="{{ url_for('static', filename='images/home_fig.png') }}"
+        alt="BeatSlice hero"
+        class="img-fluid home-hero-img"
+      >
+    </div>
+  </div>
+</div>
+{% endblock %}

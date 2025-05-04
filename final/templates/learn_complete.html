@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+{% block content %}
+<!–– Learn Complete: full confetti + centered content ––>
+<style>
+  /* make the confetti canvas fill the screen */
+  #confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+  }
+  /* center the text & buttons vertically */
+  .learn-complete-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+  }
+  .learn-complete-wrapper h2 {
+    margin-bottom: 3rem;  /* increased from 2rem to 3rem */
+    font-weight: 700;
+  }
+  .learn-complete-wrapper .btn-group {
+    display: flex;
+    gap: 2rem;
+  }
+</style>
+
+<!-- confetti canvas -->
+<canvas id="confetti-canvas"></canvas>
+
+<div class="learn-complete-wrapper">
+  <h2>Congratulations on completing all the learning tutorials!</h2>
+  <div class="btn-group">
+    <a href="{{ url_for('home') }}" class="btn btn-outline-custom">HOME</a>
+    <a href="{{ url_for('quiz', step=1) }}" class="btn btn-primary-custom">QUIZ</a>
+  </div>
+</div>
+
+<!-- load canvas-confetti from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+<script>
+  // launch a confetti shower for 5 seconds
+  (function() {
+    const duration = 5 * 1000;
+    const end = Date.now() + duration;
+    const confettiCanvas = document.getElementById('confetti-canvas');
+    const myConfetti = confetti.create(confettiCanvas, { resize: true, useWorker: true });
+
+    (function frame() {
+      if (Date.now() > end) return;
+      for (let i = 0; i < 20; i++) {
+        myConfetti({
+          particleCount: 2,
+          angle: Math.random() * 360,
+          spread: 60,
+          origin: { x: Math.random(), y: -0.1 }
+        });
+      }
+      requestAnimationFrame(frame);
+    })();
+  })();
+</script>
+{% endblock %}

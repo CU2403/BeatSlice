@@ -1,0 +1,275 @@
+{% extends "layout.html" %}
+{% block content %}
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<style>
+  .progress-label { margin-right:0.5rem; font-weight:500; }
+
+
+  .master-control {
+    background: #f1f3f5;
+    border-radius: 0.75rem;
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+    max-width: 800px;
+    margin: 1.5rem auto;
+  }
+  .master-play-btn {
+    width: 40px; height: 40px;
+    border: 2px solid #2154FF;
+    border-radius: 0.5rem;
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .master-play-btn:hover { background: rgba(33,84,255,0.1); }
+  .master-play-btn.active { background: rgba(33,84,255,0.2); }
+  .master-slider {
+    flex-grow: 1;
+    margin-left: 1rem;
+    -webkit-appearance: none;
+    width: 100%; height: 4px; background: #e9ecef; border-radius: 2px;
+    cursor: pointer;
+  }
+  .master-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px;
+    background: #2154FF; border-radius: 50%; cursor: pointer;
+  }
+
+
+  #mix-visualizer {
+    display:block; margin:0 auto 1.5rem;
+    width:800px; max-width:100%;
+    height:150px; background:#f1f3f5;
+    border-radius:0.75rem;
+  }
+
+  .droppable-area {
+    height:150px;
+    border:2px solid #2154FF;
+    border-radius:1rem;
+    background:#fff;
+    padding:1rem;
+  }
+
+
+  .track-btn {
+    width:80px; height:80px;
+    border-radius:0.75rem;
+    color:#fff; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center;
+    margin:0.5rem; cursor:move;
+  }
+  .track-btn.drums  { background:#2EBB46; }
+  .track-btn.vocals { background:#F4BC17; }
+  .track-btn.bass   { background:#DB2E38; }
+  .track-btn.melody { background:#2E2E36; }
+
+
+  .btn-back {
+    background-color:#667090 !important;
+    color:#fff !important;
+    border:none !important;
+    border-radius:1.5rem !important;
+    min-width:240px; height:72px;
+    font-size:1.5rem; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center;
+    text-transform:uppercase;
+  }
+</style>
+
+<div class="container py-5">
+
+  <div class="d-flex align-items-center mb-3">
+    <span class="me-2">4/7</span>
+    <div class="progress flex-grow-1" style="height:12px; border-radius:6px;">
+      <div class="progress-bar" role="progressbar" style="width:57.14%;"></div>
+    </div>
+  </div>
+
+
+  <canvas id="mix-visualizer"></canvas>
+
+
+  <div class="master-control">
+    <div id="master-play-btn" class="master-play-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#2154FF" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+    </div>
+
+    <input id="master-slider" type="range" min="0" max="100" step="0.1" class="master-slider" disabled value="0">
+  </div>
+
+
+  <p class="mb-3">Drag the buttons into the left frame to mix stems.</p>
+
+
+  <div class="row gx-4 mb-5">
+    <div class="col-md-6">
+      <div id="drop-area" class="droppable-area"></div>
+    </div>
+    <div class="col-md-6">
+      <div id="pick-area" class="droppable-area">
+        <div class="track-btn drums"  data-track="drums_04">Drums</div>
+        <div class="track-btn vocals" data-track="vocals_04">Vocals</div>
+        <div class="track-btn bass"   data-track="bass_04">Bass</div>
+        <div class="track-btn melody" data-track="melody_04">Melody</div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="d-flex justify-content-between">
+    <a href="{{ url_for('learn3') }}" class="btn btn-back">BACK</a>
+    <a href="{{ url_for('learn5') }}" class="btn btn-primary-custom">NEXT</a>
+  </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script>
+$(function(){
+
+  $(".track-btn").draggable({
+    helper:"original", revert:"invalid",
+    start(){ $(this).css("opacity",0.5) },
+    stop(){ $(this).css("opacity",1) }
+  });
+  $("#drop-area, #pick-area").droppable({
+    accept:".track-btn",
+    drop(e,ui){
+      ui.draggable.appendTo(this).css({top:0,left:0});
+      syncMasterState();
+    }
+  });
+
+
+  const stems = ["drums_04","vocals_04","bass_04","melody_04"];
+  const AudioC = window.AudioContext||window.webkitAudioContext;
+  const ctx = new AudioC();
+  const analyser = ctx.createAnalyser();
+  analyser.fftSize = 256;
+  analyser.connect(ctx.destination);
+
+
+  const audioEls = {};
+  stems.forEach(id=>{
+    const a = new Audio("{{ url_for('static', filename='audio/') }}"+id+".wav");
+    audioEls[id] = a;
+    const srcNode = ctx.createMediaElementSource(a);
+    srcNode.connect(analyser);
+  });
+
+
+  const canvas = document.getElementById("mix-visualizer"),
+        c = canvas.getContext("2d");
+  function resizeCanvas(){
+    canvas.width = canvas.clientWidth * devicePixelRatio;
+    canvas.height = canvas.clientHeight * devicePixelRatio;
+    c.scale(devicePixelRatio, devicePixelRatio);
+  }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+  const dataArr = new Uint8Array(analyser.frequencyBinCount);
+  (function draw(){
+    requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(dataArr);
+    c.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
+    const w = canvas.clientWidth / dataArr.length;
+    dataArr.forEach((v,i)=>{
+      const h = (v/255)*canvas.clientHeight;
+      c.fillStyle = `hsl(${120*v/255},100%,40%)`;
+      c.fillRect(i*w, canvas.clientHeight - h, w*0.8, h);
+    });
+  })();
+
+
+  const btnPlay = document.getElementById("master-play-btn"),
+        slider  = document.getElementById("master-slider");
+  let playing = false;
+
+  function getDropped(){
+    return $("#drop-area .track-btn").toArray().map(el=>$(el).data("track"));
+  }
+
+  function updateIcon(){
+    const path = btnPlay.querySelector("path");
+    if(playing){
+      path.setAttribute("d","M6 19h4V5H6v14zm8-14v14h4V5h-4z");
+      btnPlay.classList.add("active");
+    } else {
+      path.setAttribute("d","M8 5v14l11-7z");
+      btnPlay.classList.remove("active");
+    }
+  }
+
+
+  function updateSliderBackground(){
+    const pct = slider.value;
+    slider.style.background = `linear-gradient(to right, #2154FF ${pct}%, #e9ecef ${pct}%)`;
+  }
+
+  function syncMasterState(){
+    const dropped = getDropped();
+    stems.forEach(id=>{ if(!dropped.includes(id)) audioEls[id].pause(); });
+    if(playing && dropped.length){
+      const t0 = audioEls[dropped[0]].currentTime;
+      dropped.forEach(id=>{
+        audioEls[id].currentTime = t0;
+        audioEls[id].play();
+      });
+    }
+  }
+
+  btnPlay.onclick = ()=>{
+    if(ctx.state==="suspended") ctx.resume();
+    playing = !playing;
+    const dropped = getDropped();
+    if(playing && dropped.length){
+      slider.disabled = false;
+      const t0 = audioEls[dropped[0]].currentTime;
+      dropped.forEach(id=>{
+        audioEls[id].currentTime = t0;
+        audioEls[id].play();
+      });
+    } else {
+      dropped.forEach(id=>audioEls[id].pause());
+    }
+    updateIcon();
+  };
+
+
+  slider.oninput = ()=>{
+    const pct = slider.value/100,
+          dropped = getDropped();
+    if(!dropped.length) return;
+    const dur = audioEls[dropped[0]].duration||1,
+          t   = pct*dur;
+    dropped.forEach(id=>audioEls[id].currentTime=t);
+    updateSliderBackground();
+  };
+
+
+  stems.forEach(id=>{
+    audioEls[id].addEventListener("timeupdate",()=>{
+      if(!getDropped().includes(id)) return;
+      const base = audioEls[id],
+            pct  = base.duration ? (base.currentTime/base.duration)*100 : 0;
+      slider.value = pct.toFixed(1);
+      updateSliderBackground();
+      getDropped().forEach(other=>{
+        if(Math.abs(audioEls[other].currentTime - base.currentTime) > 0.1){
+          audioEls[other].currentTime = base.currentTime;
+        }
+      });
+    });
+  });
+
+
+  updateSliderBackground();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,161 @@
+/* ================================
+
+   ================================ */
+   * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  html, body {
+    width: 100%;
+    height: 100%;
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    color: #212529;
+    background-color: #ffffff;
+  }
+  
+  /* ================================
+
+     ================================ */
+  .navbar {
+    background-color: #2154FF !important;
+    padding: 1rem 2rem;
+  }
+  .navbar-brand {
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size:  3rem !important;
+  }
+  .navbar-nav .nav-link {
+    color: #ffffff !important;
+    font-weight: 500;
+    margin-left: 3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .navbar-nav .nav-link:hover {
+    text-decoration: underline;
+  }
+  
+  /* ================================
+
+     ================================ */
+  .btn-primary-custom {
+    background-color: #2154FF !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 1.5rem !important;
+    min-width: 240px;
+    height: 72px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, transform 0.1s;
+  }
+  .btn-primary-custom:hover {
+    background-color: #1a43d1 !important;
+  }
+  .btn-primary-custom:active {
+    transform: scale(0.98);
+  }
+  
+  /* ================================
+
+     ================================ */
+  .btn-outline-custom {
+    border: 2px solid #2154FF !important;
+    background-color: transparent !important;
+    color: #2154FF !important;
+    border-radius: 1.5rem !important;
+    min-width: 240px;
+    height: 72px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .btn-outline-custom:hover {
+    background-color: rgba(33, 84, 255, 0.1) !important;
+  }
+  
+  /* ================================
+
+     ================================ */
+  .btn-back {
+    background-color: #667090 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 1.5rem !important;
+    min-width: 240px;
+    height: 72px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, transform 0.1s;
+  }
+  .btn-back:hover {
+    background-color: #5a657d !important;
+  }
+  .btn-back:active {
+    transform: scale(0.98);
+  }
+  
+  /* ================================
+
+     ================================ */
+  .display-5 { font-size: 3rem; font-weight: 700; }
+  .text-secondary { color: #6c757d !important; }
+  .img-fluid { max-width: 100%; height: auto; }
+  .d-flex { display: flex !important; }
+  .gap-4 { gap: 1.5rem !important; }
+  .mt-5 { margin-top: 3rem !important; }
+  .py-5 { padding-top: 3rem !important; padding-bottom: 3rem !important; }
+  
+  /* ========= Learn1  ========= */
+  .stem-button {
+    width: 150px;
+    height: 150px;
+    border: 3px solid transparent;
+    border-radius: 1rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    transition: transform 0.1s, box-shadow 0.2s, opacity 0.2s;
+  }
+  .stem-button.vocals { background-color: #F4BC17; }
+  .stem-button.drums  { background-color: #2EBB46; }
+  .stem-button.bass   { background-color: #DB2E38; }
+  .stem-button.other  { background-color: #2E2E36; }
+  
+  .stem-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .stem-button.active {
+    opacity: 0.8;
+    box-shadow: 0 0 0 4px rgba(33,84,255,0.5);
+  }
+  
+  .visualizer-container {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.75rem;
+  }
+  #stemCanvas {
+    width: 100%;
+    height: 150px;
+    display: block;
+  }
+  

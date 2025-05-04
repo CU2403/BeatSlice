@@ -1,0 +1,150 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  .quiz-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 3rem 0;
+  }
+  .quiz-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .quiz-header .step {
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  .quiz-header .question {
+    font-size: 1.125rem;
+    font-weight: 500;
+  }
+  .quiz-main-audio {
+    width: 75%;
+    max-width: 800px;
+    margin-bottom: 2rem;
+  }
+  .quiz-main-audio audio {
+    width: 100%;
+  }
+  .option-list {
+    width: 75%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .option-wrapper {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-radius: 2rem;
+    border: 2px solid transparent;
+    position: relative;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .option-wrapper input[type="radio"] {
+    margin-right: 1rem;
+    transform: scale(1.25);
+  }
+  .option-wrapper audio {
+    flex-grow: 1;
+    margin-left: 1rem;
+  }
+  .option-wrapper.correct {
+    background: rgba(46, 187, 70, 0.1);
+    border-color: #2EBB46;
+  }
+  .option-wrapper.correct::after {
+    content: "✔";
+    position: absolute;
+    right: 1rem;
+    font-size: 1.25rem;
+    color: #2EBB46;
+  }
+  .option-wrapper.incorrect {
+    background: rgba(219, 46, 56, 0.1);
+    border-color: #DB2E38;
+  }
+  .option-wrapper.incorrect::after {
+    content: "✖";
+    position: absolute;
+    right: 1rem;
+    font-size: 1.25rem;
+    color: #DB2E38;
+  }
+  .btn-submit {
+    display: block;
+    margin: 0 auto;
+    min-width: 240px;
+  }
+  .quiz-nav {
+    width: 75%;
+    max-width: 800px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+  }
+</style>
+
+<div class="quiz-container">
+
+  <!-- Header -->
+  <div class="quiz-header">
+    <div class="step">{{ step }}/{{ total }}</div>
+    <div class="question">
+      Listen to this piece of music and choose which of the following tracks is included in the segment.
+    </div>
+  </div>
+
+  <!-- Main Audio -->
+  <div class="quiz-main-audio">
+    <audio controls src="{{ url_for('static', filename='audio/quiz_01.mp3') }}"></audio>
+  </div>
+
+  <!-- Options + Submit -->
+  <form method="post" class="option-list">
+    {% for opt in ['a','b','c','d'] %}
+      {% set selected = (answers.get(step|string) == opt) %}
+      {% set correct  = (correct_answer == opt) %}
+      {% set state = "" %}
+      {% if feedback.get(step|string) == 'correct' and selected %}
+        {% set state = "correct" %}
+      {% elif feedback.get(step|string) == 'incorrect' %}
+        {% if selected %}
+          {% set state = "incorrect" %}
+        {% elif correct %}
+          {% set state = "correct" %}
+        {% endif %}
+      {% endif %}
+      <label class="option-wrapper {{ state }}">
+        <input
+          type="radio"
+          name="choice"
+          value="{{ opt }}"
+          {% if feedback.get(step|string) and selected %}checked{% endif %}
+          {% if feedback.get(step|string) %}disabled{% endif %}>
+        <audio controls src="{{ url_for('static', filename='audio/quiz_01_' + opt + '.mp3') }}"></audio>
+      </label>
+    {% endfor %}
+
+    <button
+      type="submit"
+      class="btn btn-outline-custom btn-submit"
+      {% if feedback.get(step|string) %}disabled{% endif %}>
+      SUBMIT
+    </button>
+  </form>
+
+  <!-- Next button only -->
+  <div class="quiz-nav">
+    <div></div>
+    <a href="{{ url_for('quiz', step=2) }}" class="btn btn-primary-custom">NEXT</a>
+  </div>
+
+</div>
+{% endblock %}

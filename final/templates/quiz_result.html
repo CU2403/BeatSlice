@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  /* Center everything vertically & horizontally */
+  .result-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    text-align: center;
+  }
+  .result-wrapper h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2.5rem;
+  }
+  .result-buttons {
+    display: flex;
+    gap: 2rem;
+  }
+</style>
+
+<div class="result-wrapper">
+  <h2>Your score is {{ score }}/{{ total }}</h2>
+  <div class="result-buttons">
+    <a href="{{ url_for('home') }}" class="btn btn-outline-custom">HOME</a>
+    <a href="{{ url_for('quiz', step=1) }}" class="btn btn-primary-custom">RETAKE QUIZ</a>
+  </div>
+</div>
+{% endblock %}
